@@ -1,0 +1,34 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          max performance cpu
+# Required-Start:    
+# X-Start-Before:    hostname keymap keyboard-setup procps pcmcia hwclock hwclockfirst hdparm hibernate-cleanup lvm2
+# Required-Stop:
+# Default-Start:     S
+# Default-Stop:
+# Short-Description: enable high performance cpu
+# Description:       Starts or stops 
+### END INIT INFO
+
+ACTION="$1"
+
+case "$ACTION" in
+  start)
+    find /sys/devices/system/cpu -name scaling_governor -print | while read CPU; do
+  	   echo "performance" > $CPU
+   done
+	;;
+  stop)
+    find /sys/devices/system/cpu -name scaling_governor -print | while read CPU; do
+  	   echo "ondemand" > $CPU
+	done
+	;;
+  restart|force-reload)
+ 	/etc/init.d/cpufreq stop
+ 	/etc/init.d/cpufreq start
+	;;
+  *)
+	echo "Usage: $SCRIPTNAME {start|stop|restart|force-reload}" >&2
+	exit 3
+	;;
+esac
