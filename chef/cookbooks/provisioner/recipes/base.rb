@@ -80,3 +80,19 @@ cookbook_file config_file do
   source "chef-client"
 end
 
+cpu_freq = "/etc/init.d/cpufreq"
+cookbook_file cpu_freq do
+  owner "root"
+  group "root"
+  mode "0555"
+  action :create
+  source "cpufreq"
+end
+
+service "cpufreq" do
+  service_name "cpufreq"
+  supports :restart => true, :reload => true
+  running true
+  enabled true
+  action [ :enable, :start ]
+end
