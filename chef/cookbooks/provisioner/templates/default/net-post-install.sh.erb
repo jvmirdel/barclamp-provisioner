@@ -100,6 +100,19 @@ post_state $HOSTNAME "installed"
 # Wait for DHCP to update - this is mainly for virtual environments or really large deploys
 sleep 30
 
+# For C2100's with the dual 1 and dual 10's force the ordering to 0,1 on the 1 g, and 2, 3 on the 10, in bus order
+ 
+-sed -ibak -e '/04:00.0/,+1 s/eth[0-9]/eth2/' -e '/04:00.1/,+1 s/eth[0-9]/eth3/' -e '/07:00.0/,+1 s/eth[0-9]/eth0/' -e '/07:00.1/,+1 s/eth[0-9]/eth1/' /etc/udev/rules.d/70-persistent-net.rules
+(
+
+set -x
+sed -ibak -e '/04:00.0/,+1 s/eth[0-9]/eth2/' -e '/04:00.1/,+1 s/eth[0-9]/eth3/' -e '/0[67]:00.0/,+1 s/eth[0-9]/eth0/' -e '/0[67]:00.1/,+1 s/eth[0-9]/eth1/' /etc/udev/rules.d/70-persistent-net.rules
+
+# Fixup the network interfaces so that boot services are on eth0
+sed -iback -e 's/eth[0-9]/eth0/' /etc/network/interfaces
+) > /var/log/net_fixup.log 2>&1
+
+
 EOF
 
 mount /proc /target/proc
